@@ -641,6 +641,14 @@ export default function MainClient({ initialData, mode }: { initialData: MediaIt
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Footer */}
+        <footer className="w-full max-w-[1200px] mx-auto flex flex-wrap items-center justify-center gap-6 py-8 px-6 text-[12px] font-medium text-white/40 uppercase tracking-widest border-t border-white/5 mt-12 md:mt-24">
+          <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+          <Link href="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link>
+          <Link href="/about" className="hover:text-white transition-colors">About Us</Link>
+          <Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link>
+        </footer>
       </div>
     </>
   );
