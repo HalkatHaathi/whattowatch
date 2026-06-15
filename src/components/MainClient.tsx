@@ -11,7 +11,8 @@ import RouletteForm from "./RouletteForm";
 import RouletteSpinner from "./RouletteSpinner";
 import { useHistory } from "@/hooks/useHistory";
 import { useWatchlist } from "@/hooks/useWatchlist";
-import { getRecommendation, Mood, Time, ContentType, SortOption } from "@/utils/recommend";
+import { Mood, Time, ContentType, SortOption } from "@/utils/recommend";
+import { getAllGenres, searchMedia, getServerRecommendation } from "@/app/actions";
 
 const savedContainerVariants = {
   hidden: { opacity: 0 },
@@ -33,7 +34,7 @@ const savedItemVariants = {
   }
 };
 
-export default function MainClient({ initialData, mode }: { initialData: MediaItem[]; mode: "wizard" | "roulette" | "saved" }) {
+export default function MainClient({ mode }: { mode: "wizard" | "roulette" | "saved" }) {
   const { history, addToHistory } = useHistory();
   const { watchlist, toggleSave, isSaved } = useWatchlist();
 
@@ -44,17 +45,13 @@ export default function MainClient({ initialData, mode }: { initialData: MediaIt
   const [sort, setSort] = useState<SortOption>("recommended");
   const [genre, setGenre] = useState<string | null>(null);
   const [recommendation, setRecommendation] = useState<MediaItem | null>(null);
+  const [isRecommending, setIsRecommending] = useState(false);
 
-  // Extract all unique genres from initialData
-  const allGenres = useMemo(() => {
-    const genresSet = new Set<string>();
-    initialData.forEach(item => {
-      if (item.genres) {
-        item.genres.forEach(g => genresSet.add(g));
-      }
-    });
-    return Array.from(genresSet).sort();
-  }, [initialData]);
+  const [allGenres, setAllGenres] = useState<string[]>([]);
+  
+  useEffect(() => {
+    getAllGenres().then(setAllGenres).catch(console.error);
+  }, []);
 
   // Roulette State
   const [rouletteOptions, setRouletteOptions] = useState<MediaItem[] | null>(null);
@@ -90,13 +87,24 @@ export default function MainClient({ initialData, mode }: { initialData: MediaIt
     };
   }, [globalSearchOpen]);
 
-  const globalSearchResults = globalSearchQuery.trim()
-    ? (() => {
-      const matches = initialData.filter(m => m.title.toLowerCase().includes(globalSearchQuery.toLowerCase()));
-      const unique = Array.from(new Map(matches.map(m => [m.id, m])).values());
-      return unique.slice(0, 8);
-    })()
-    : [];
+  const [globalSearchResults, setGlobalSearchResults] = useState<MediaItem[]>([]);
+  const [isGlobalSearching, setIsGlobalSearching] = useState(false);
+
+  useEffect(() => {
+    if (!globalSearchQuery.trim()) {
+      setGlobalSearchResults([]);
+      setIsGlobalSearching(false);
+      return;
+    }
+    setIsGlobalSearching(true);
+    const delayDebounceFn = setTimeout(() => {
+      searchMedia(globalSearchQuery)
+        .then(setGlobalSearchResults)
+        .catch(console.error)
+        .finally(() => setIsGlobalSearching(false));
+    }, 300);
+    return () => clearTimeout(delayDebounceFn);
+  }, [globalSearchQuery]);
 
   const validSlots = slots.filter((val) => val !== null) as MediaItem[];
   const canSpin = validSlots.length >= 2;
@@ -104,23 +112,27 @@ export default function MainClient({ initialData, mode }: { initialData: MediaIt
   // Trigger recommendation whenever wizard filters change
   useEffect(() => {
     if (mode === "wizard") {
-      const result = getRecommendation(initialData, mood, time, type, history, sort, genre);
+      setIsRecommending(true);
+      getServerRecommendation(mood, time, type, history, sort, genre).then(result => {
+        if (result) {
+          setRecommendation(result);
+          addToHistory(result.id);
+        } else {
+          setRecommendation(null);
+        }
+      }).catch(console.error).finally(() => setIsRecommending(false));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mood, time, type, sort, genre, mode]);
+
+  const handleReroll = () => {
+    setIsRecommending(true);
+    getServerRecommendation(mood, time, type, history, sort, genre).then(result => {
       if (result) {
         setRecommendation(result);
         addToHistory(result.id);
-      } else {
-        setRecommendation(null);
       }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mood, time, type, sort, genre, initialData, mode]);
-
-  const handleReroll = () => {
-    const result = getRecommendation(initialData, mood, time, type, history, sort, genre);
-    if (result) {
-      setRecommendation(result);
-      addToHistory(result.id);
-    }
+    }).catch(console.error).finally(() => setIsRecommending(false));
   };
 
   return (
@@ -222,7 +234,7 @@ export default function MainClient({ initialData, mode }: { initialData: MediaIt
                 Saved Recommendations
               </h1>
               <span className="bg-white/10 border border-white/10 px-4 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wider text-white/80">
-                {watchlist.length} {watchlist.length === 1 ? "Item" : "Items"}
+                {watchlist.length} <span className="hidden sm:inline">{watchlist.length === 1 ? "Item" : "Items"}</span>
               </span>
             </motion.div>
 
@@ -332,7 +344,6 @@ export default function MainClient({ initialData, mode }: { initialData: MediaIt
                 ) : (
                   <RouletteForm
                     key="roulette"
-                    allMedia={initialData}
                     slots={slots}
                     setSlots={setSlots}
                   />
@@ -390,6 +401,27 @@ export default function MainClient({ initialData, mode }: { initialData: MediaIt
                         </motion.button>
                       </motion.div>
                     )
+                  ) : isRecommending ? (
+                    <motion.div
+                      key="loading-wizard"
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -15 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex flex-col items-center justify-start pt-12 w-full h-[400px]"
+                    >
+                      <div 
+                        className="w-full pb-8 flex justify-center items-center text-white text-[16px] md:text-[20px] font-black uppercase font-sans leading-none"
+                        style={{ 
+                          textShadow: "0 0 4px #fff, 0 0 10px #fff, 0 0 20px #0ff, 0 0 40px #0ff, 0 0 80px #0ff" 
+                        }}
+                      >
+                        {"COMING SOON".split("").map((char, index) => (
+                          <span key={index} className="mx-[1px]">{char === " " ? "\u00A0\u00A0" : char}</span>
+                        ))}
+                      </div>
+                      <div className="w-10 h-10 border-4 border-white/20 border-t-[#0ff] rounded-full animate-spin mt-16 shadow-[0_0_20px_#0ff]" />
+                    </motion.div>
                   ) : recommendation ? (
                     <RecommendationCard
                       key={recommendation.id}
@@ -630,11 +662,20 @@ export default function MainClient({ initialData, mode }: { initialData: MediaIt
                       </div>
                     </button>
                   ))}
-                  {globalSearchQuery.length >= 2 && globalSearchResults.length === 0 && (
-                    <div className="p-8 text-center text-white/40">No results found for &quot;{globalSearchQuery}&quot;</div>
-                  )}
-                  {globalSearchQuery.length < 2 && (
-                    <div className="p-8 text-center text-white/40">Type to search...</div>
+                  {isGlobalSearching ? (
+                    <div className="p-8 text-center text-white/40 flex flex-col items-center gap-3">
+                      <div className="w-6 h-6 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" />
+                      <span>Searching...</span>
+                    </div>
+                  ) : (
+                    <>
+                      {globalSearchQuery.length >= 2 && globalSearchResults.length === 0 && (
+                        <div className="p-8 text-center text-white/40">No results found for &quot;{globalSearchQuery}&quot;</div>
+                      )}
+                      {globalSearchQuery.length < 2 && (
+                        <div className="p-8 text-center text-white/40">Type to search...</div>
+                      )}
+                    </>
                   )}
                 </div>
               </motion.div>

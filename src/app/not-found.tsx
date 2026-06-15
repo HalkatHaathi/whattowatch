@@ -4,11 +4,9 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Film, Home } from "lucide-react";
 import LEDNavbar from "@/components/LEDNavbar";
-import dataJson from "../../public/data.json";
 
 export default function NotFound() {
-  // Select first movie (Severance) for a beautiful cinematic poster background
-  const sampleMovie = dataJson[0];
+  const sampleThumbnail = "https://image.tmdb.org/t/p/w500/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg";
 
   return (
     <main className="w-full h-screen pt-20 overflow-hidden relative bg-[#0a0a0a] text-white flex items-center justify-center">
@@ -16,10 +14,10 @@ export default function NotFound() {
 
       {/* Dynamic Ambient Cinematic Background */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-[#0a0a0a]">
-        {sampleMovie && (
+        {sampleThumbnail && (
           <div 
             className="absolute inset-[-20%] w-[140%] h-[140%] bg-cover bg-center blur-[80px] saturate-150 transform-gpu opacity-40"
-            style={{ backgroundImage: `url(${sampleMovie.thumbnail})` }}
+            style={{ backgroundImage: `url(${sampleThumbnail})` }}
           />
         )}
         <div className="absolute inset-0 bg-black/65" />

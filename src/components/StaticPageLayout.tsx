@@ -53,7 +53,7 @@ export default function StaticPageLayout({ title, subtitle, children }: StaticPa
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-          className="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-headings:font-bold prose-headings:tracking-tight prose-a:text-yellow-400 prose-a:no-underline hover:prose-a:text-yellow-300 prose-p:leading-relaxed prose-p:text-white/70 prose-li:text-white/70 flex-grow"
+          className="flex-grow text-lg leading-relaxed text-white/70 [&>h1]:text-4xl [&>h1]:font-black [&>h1]:text-white [&>h1]:mb-6 [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-white [&>h2]:mb-4 [&>h2]:mt-10 [&>h3]:text-xl [&>h3]:font-bold [&>h3]:text-white [&>h3]:mb-3 [&>h3]:mt-8 [&>p]:mb-6 [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-6 [&>ul>li]:mb-2 [&>ol]:list-decimal [&>ol]:pl-6 [&>ol]:mb-6 [&>ol>li]:mb-2 [&>a]:text-yellow-400 [&>a]:underline hover:[&>a]:text-yellow-300"
         >
           {children}
         </motion.main>

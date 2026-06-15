@@ -205,9 +205,9 @@ export default function WizardForm({
                   >
                     Any
                   </button>
-                  {availableGenres.map((g) => (
+                  {availableGenres.map((g, index) => (
                     <button
-                      key={g}
+                      key={`${g}-${index}`}
                       onClick={() => onChangeGenre(g)}
                       className={`px-[12px] py-[6px] rounded-full text-[12px] font-medium transition-colors duration-300 flex-shrink-0 cursor-pointer ${
                         genre === g

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Plus } from "lucide-react";
 import { MediaItem } from "@/types";
 
+import { searchMedia } from "@/app/actions";
+
 interface RouletteFormProps {
-  allMedia: MediaItem[];
   slots: (MediaItem | null)[];
   setSlots: (slots: (MediaItem | null)[]) => void;
 }
@@ -28,9 +29,10 @@ const itemVariants = {
   }
 };
 
-export default function RouletteForm({ allMedia, slots, setSlots }: RouletteFormProps) {
+export default function RouletteForm({ slots, setSlots }: RouletteFormProps) {
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<MediaItem[]>([]);
 
   const handleSelect = (item: MediaItem) => {
     if (activeSlot !== null) {
@@ -39,6 +41,7 @@ export default function RouletteForm({ allMedia, slots, setSlots }: RouletteForm
       setSlots(newSlots);
       setActiveSlot(null);
       setSearchQuery("");
+      setSearchResults([]);
     }
   };
 
@@ -49,13 +52,23 @@ export default function RouletteForm({ allMedia, slots, setSlots }: RouletteForm
     setSlots(newSlots);
   };
 
-  const searchResults = searchQuery.trim()
-    ? (() => {
-      const matches = allMedia.filter(m => m.title.toLowerCase().includes(searchQuery.toLowerCase()));
-      const unique = Array.from(new Map(matches.map(m => [m.id, m])).values());
-      return unique.slice(0, 8);
-    })()
-    : [];
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+    setIsSearching(true);
+    const delayDebounceFn = setTimeout(() => {
+      searchMedia(searchQuery)
+        .then(setSearchResults)
+        .catch(console.error)
+        .finally(() => setIsSearching(false));
+    }, 300);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
 
   return (
     <motion.div
@@ -92,7 +105,7 @@ export default function RouletteForm({ allMedia, slots, setSlots }: RouletteForm
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex-1 bg-transparent text-white outline-none placeholder:text-white/30 text-[16px]"
                 />
-                <button onClick={() => { setActiveSlot(null); setSearchQuery(""); }} className="text-white/40 hover:text-white transition-colors">
+                <button onClick={() => { setActiveSlot(null); setSearchQuery(""); setSearchResults([]); }} className="text-white/40 hover:text-white transition-colors">
                   <X size={20} />
                 </button>
               </div>
@@ -111,11 +124,20 @@ export default function RouletteForm({ allMedia, slots, setSlots }: RouletteForm
                     </div>
                   </button>
                 ))}
-                {searchQuery.length >= 2 && searchResults.length === 0 && (
-                  <div className="p-8 text-center text-white/40">No results found for &quot;{searchQuery}&quot;</div>
-                )}
-                {searchQuery.length < 2 && (
-                  <div className="p-8 text-center text-white/40">Type to search our database...</div>
+                {isSearching ? (
+                  <div className="p-8 text-center text-white/40 flex flex-col items-center gap-3">
+                    <div className="w-6 h-6 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" />
+                    <span>Searching...</span>
+                  </div>
+                ) : (
+                  <>
+                    {searchQuery.length >= 2 && searchResults.length === 0 && (
+                      <div className="p-8 text-center text-white/40">No results found for &quot;{searchQuery}&quot;</div>
+                    )}
+                    {searchQuery.length < 2 && (
+                      <div className="p-8 text-center text-white/40">Type to search our database...</div>
+                    )}
+                  </>
                 )}
               </div>
             </motion.div>
