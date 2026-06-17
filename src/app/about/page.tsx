@@ -3,15 +3,15 @@ import StaticPageLayout from "@/components/StaticPageLayout";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About Us | What To Watch",
-  description: "Learn more about the team behind What To Watch and our mission to cure decision fatigue.",
+  title: "About Us | Watch That Next",
+  description: "Learn more about the team behind Watch That Next and our mission to cure decision fatigue.",
 };
 
 export default function AboutPage() {
   return (
     <StaticPageLayout title="About Us" subtitle="Curing the paradox of choice.">
       <p className="lead text-xl text-white">
-        We built <strong>WhatToWatch</strong> because we were tired of spending more time searching for a movie than actually watching it.
+        We built <strong>Watch That Next</strong> because we were tired of spending more time searching for a movie than actually watching it.
       </p>
 
       <h2>Our Mission</h2>
@@ -19,7 +19,7 @@ export default function AboutPage() {
         In the era of infinite streaming services, the paradox of choice is real. You sit down with a hot meal, open your favorite streaming app, and spend 45 minutes scrolling through endless grids of thumbnails. By the time you finally pick something, your food is cold and you&apos;re too tired to pay attention.
       </p>
       <p>
-        Our mission is to act as your ultimate <em>online ruler</em> for entertainment—a precision tool designed to cut through the noise. We believe that technology should do the heavy lifting of decision-making, allowing you to focus on the experience of great cinema and television.
+        Our mission is to act as your ultimate companion for entertainment—a precision tool designed to cut through the noise. We believe that technology should do the heavy lifting of decision-making, allowing you to focus on the experience of great cinema and television.
       </p>
 
       <h2>How It Works</h2>
@@ -34,7 +34,7 @@ export default function AboutPage() {
 
       <h2>The Design Philosophy</h2>
       <p>
-        We intentionally designed WhatToWatch to be immersive, cinematic, and incredibly fast. No logins, no paywalls, no bloated features. Just a sleek, distraction-free environment that gets you from &quot;I don&apos;t know what to watch&quot; to pressing play in under 30 seconds.
+        We intentionally designed Watch That Next to be immersive, cinematic, and incredibly fast. No logins, no paywalls, no bloated features. Just a sleek, distraction-free environment that gets you from &quot;I don&apos;t know what to watch&quot; to pressing play in under 30 seconds.
       </p>
 
       <div className="mt-12 p-8 bg-white/5 border border-white/10 rounded-2xl text-center">

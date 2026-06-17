@@ -64,7 +64,7 @@ export default function StaticPageLayout({ title, subtitle, children }: StaticPa
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mt-24 pt-8 border-t border-white/10 text-center text-sm text-white/30 uppercase tracking-widest"
         >
-          © {new Date().getFullYear()} WhatToWatch. All rights reserved.
+          © {new Date().getFullYear()} Watch That Next. All rights reserved.
         </motion.footer>
       </div>
     </div>

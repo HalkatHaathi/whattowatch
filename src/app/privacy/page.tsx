@@ -2,15 +2,15 @@ import { Metadata } from "next";
 import StaticPageLayout from "@/components/StaticPageLayout";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | What To Watch",
-  description: "Privacy Policy for What To Watch. Learn how we handle your data and protect your privacy.",
+  title: "Privacy Policy | Watch That Next",
+  description: "Privacy Policy for Watch That Next. Learn how we handle your data and protect your privacy.",
 };
 
 export default function PrivacyPage() {
   return (
     <StaticPageLayout title="Privacy Policy" subtitle="Last Updated: October 2023">
       <p>
-        At <strong>WhatToWatch</strong>, we respect your privacy and are committed to protecting it through our compliance with this policy. This Privacy Policy describes the types of information we may collect from you or that you may provide when you visit the website, and our practices for collecting, using, maintaining, protecting, and disclosing that information.
+        At <strong>Watch That Next</strong>, we respect your privacy and are committed to protecting it through our compliance with this policy. This Privacy Policy describes the types of information we may collect from you or that you may provide when you visit the website, and our practices for collecting, using, maintaining, protecting, and disclosing that information.
       </p>
 
       <h2>1. Information We Collect</h2>

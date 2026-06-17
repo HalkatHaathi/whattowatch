@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://whattowatch.com'
+  const baseUrl = 'https://watchthatnext.com'
 
   return [
     {

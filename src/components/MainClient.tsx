@@ -462,9 +462,9 @@ export default function MainClient({ mode }: { mode: "wizard" | "roulette" | "sa
         {mode === "wizard" && (
           <section className="w-full max-w-[800px] mx-auto md:py-12 px-6 md:px-12 text-white/70 font-sans">
             <header className="mb-12 text-center">
-              <h2 className="text-3xl md:text-5xl font-black text-white mb-6 tracking-tighter">Your Ultimate Online Ruler for Entertainment</h2>
+              <h2 className="text-3xl md:text-5xl font-black text-white mb-6 tracking-tighter">Your Ultimate Guide for Entertainment</h2>
               <p className="text-lg leading-relaxed text-white/60">
-                Never waste another evening scrolling aimlessly. We are your definitive guide for deciding exactly what to watch.
+                Never waste another evening scrolling aimlessly. Watch That Next is your definitive companion for deciding exactly what to watch.
               </p>
             </header>
 
@@ -472,10 +472,10 @@ export default function MainClient({ mode }: { mode: "wizard" | "roulette" | "sa
               <div>
                 <h3 className="text-xl font-bold text-white mb-4">Deciding What to Watch Just Got Easier</h3>
                 <p className="mb-4">
-                  Finding the perfect entertainment can often feel like measuring the ocean with an online ruler—an impossible task without the right tools. Whether you are looking for new movies to watch or trying to figure out where to watch the latest trending tv shows to watch, the paradox of choice can be paralyzing. Our smart movie recommendation engine cuts through the noise, matching your exact mood, available time, and genre preferences to deliver guaranteed hits.
+                  Finding the perfect entertainment can often feel like searching for a needle in a haystack—an impossible task without the right tools. Whether you are looking for new movies to watch or trying to figure out where to watch the latest trending tv shows, the paradox of choice can be paralyzing. Our smart movie recommendation engine cuts through the noise, matching your exact mood, available time, and genre preferences to deliver guaranteed hits.
                 </p>
                 <p>
-                  Gone are the days of endlessly flipping through media libraries. We act as your precision metric, your personal online ruler, ensuring that every minute you spend in front of the screen is time well spent. From thrilling blockbusters to indie gems, we categorize and measure every movie so you don't have to.
+                  Gone are the days of endlessly flipping through media libraries. We act as your precision metric, your personal guide, ensuring that every minute you spend in front of the screen is time well spent. From thrilling blockbusters to indie gems, we categorize every movie so you don't have to.
                 </p>
               </div>
 
@@ -492,17 +492,17 @@ export default function MainClient({ mode }: { mode: "wizard" | "roulette" | "sa
               <div>
                 <h3 className="text-xl font-bold text-white mb-4">The Best TV Shows and Webseries</h3>
                 <p className="mb-4">
-                  The golden age of television means there is an abundance of tv-shows and webseries competing for your attention. Finding good tv shows to watch requires sifting through hundreds of options across dozens of platforms. If you need a reliable tv show recommendation, our platform acts as your ultimate guide.
+                  The golden age of television means there is an abundance of tv-shows and webseries competing for your attention. Finding good tv shows to watch requires sifting through hundreds of options across dozens of platforms. If you need a reliable tv show recommendation, Watch That Next acts as your ultimate guide.
                 </p>
                 <p>
-                  Are you caught up in the reality TV craze and frantically searching where to watch love island? Or perhaps you want to dive deep into a complex, multi-season drama? We track the pulse of global entertainment, ensuring that whether you want a quick 20-minute sitcom bite or a marathon-worthy epic, your next binge is just one click away. We measure the hype, the quality, and the accessibility—like a trusty online ruler—so you can sit back and press play.
+                  Are you caught up in the reality TV craze and frantically searching where to watch love island? Or perhaps you want to dive deep into a complex, multi-season drama? We track the pulse of global entertainment, ensuring that whether you want a quick 20-minute sitcom bite or a marathon-worthy epic, your next binge is just one click away. We measure the hype, the quality, and the accessibility so you can sit back and press play.
                 </p>
               </div>
 
               <div className="bg-white/5 p-8 rounded-2xl border border-white/10 mt-16">
                 <h4 className="text-lg font-bold text-white mb-3">Why Trust Our Recommendations?</h4>
                 <p className="text-sm md:text-base text-white/60">
-                  Our algorithms are designed to respect your time. We know that picking what to watch is often harder than actually watching it. By blending precise filtering (acting as your online ruler for media metrics) with a beautiful, distraction-free interface, we help you discover movies to watch and tv shows to watch faster than ever before. Stop scrolling, start watching.
+                  Our algorithms are designed to respect your time. We know that picking what to watch is often harder than actually watching it. By blending precise filtering with a beautiful, distraction-free interface, we help you discover movies to watch and tv shows to watch faster than ever before. Stop scrolling, start watching.
                 </p>
               </div>
             </div>

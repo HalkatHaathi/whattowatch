@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://whattowatch.com/sitemap.xml',
+    sitemap: 'https://watchthatnext.com/sitemap.xml',
   }
 }
