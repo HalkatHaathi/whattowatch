@@ -14,6 +14,10 @@ const MOOD_MAP: Record<Mood, string[]> = {
 
 // Ensures MediaItem is plain object (removes mongoose specific properties)
 function toPlainObject(doc: any): MediaItem {
+  let link = doc.link;
+  if (link && (link.includes("themoviedb.org/movie/") || link.includes("themoviedb.org/tv/")) && !link.endsWith("/watch")) {
+    link = `${link}/watch`;
+  }
   return {
     id: doc.id,
     type: doc.type,
@@ -27,7 +31,7 @@ function toPlainObject(doc: any): MediaItem {
     vote_count: doc.vote_count,
     release_date: doc.release_date,
     thumbnail: doc.thumbnail,
-    link: doc.link,
+    link: link,
   };
 }
 

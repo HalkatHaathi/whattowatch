@@ -104,7 +104,7 @@ async function processJsonl(filename, type) {
       const vote_count = item.vote_count || 0;
       const release_date = item.release_date || item.first_air_date || "";
       const thumbnail = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : '';
-      const link = type === 'movie' ? `https://www.themoviedb.org/movie/${item.id}` : `https://www.themoviedb.org/tv/${item.id}`;
+      const link = type === 'movie' ? `https://www.themoviedb.org/movie/${item.id}/watch` : `https://www.themoviedb.org/tv/${item.id}/watch`;
 
       // Only add items that have a poster and a rating
       if (thumbnail && rating > 0 && title) {
