@@ -12,4 +12,15 @@ export interface MediaItem {
   release_date?: string;
   thumbnail: string;
   link: string;
+  lang?: string;
+}
+
+export interface BlogPostItem {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  category: string;
+  views: number;
+  date: string;
 }

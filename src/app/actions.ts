@@ -2,8 +2,9 @@
 
 import dbConnect from "@/lib/mongodb";
 import Media from "@/models/Media";
+import BlogPost from "@/models/BlogPost";
 import { Mood, Time, ContentType, SortOption } from "@/utils/recommend";
-import { MediaItem } from "@/types";
+import { MediaItem, BlogPostItem } from "@/types";
 
 const MOOD_MAP: Record<Mood, string[]> = {
   Bored: ["Comedy", "Animation", "Family", "Adventure", "Fantasy"],
@@ -32,6 +33,7 @@ function toPlainObject(doc: any): MediaItem {
     release_date: doc.release_date,
     thumbnail: doc.thumbnail,
     link: link,
+    lang: doc.lang
   };
 }
 
@@ -44,12 +46,12 @@ export async function getAllGenres(): Promise<string[]> {
 export async function searchMedia(query: string): Promise<MediaItem[]> {
   if (!query || query.trim().length < 2) return [];
   await dbConnect();
-  
+
   // Basic regex search
   const results = await Media.find({ title: { $regex: query, $options: "i" } })
     .limit(8)
     .lean();
-    
+
   return results.map(toPlainObject);
 }
 
@@ -59,7 +61,8 @@ export async function getServerRecommendation(
   type: ContentType,
   history: string[],
   sort: SortOption = "recommended",
-  genre: string | null = null
+  genres: string[] = [],
+  language: string = "all"
 ): Promise<MediaItem | null> {
   await dbConnect();
 
@@ -74,6 +77,15 @@ export async function getServerRecommendation(
   else if (time === "30-60 min") baseQuery.runtime = { $gt: 30, $lte: 60 };
   else if (time === "60+ min") baseQuery.runtime = { $gt: 60 };
 
+  // Apply language filter strictly to baseQuery if specified
+  if (language && language !== "all") {
+    if (language === "zh") {
+      baseQuery.lang = { $in: ["zh", "cn"] };
+    } else {
+      baseQuery.lang = language;
+    }
+  }
+
   // Try applying history constraint
   let queryWithHistory = { ...baseQuery, id: { $nin: history } };
   let count = await Media.countDocuments(queryWithHistory);
@@ -83,8 +95,8 @@ export async function getServerRecommendation(
 
   // Try applying genre or mood
   let queryWithGenreOrMood = { ...activeQuery };
-  if (genre && genre !== "All") {
-    queryWithGenreOrMood.genres = genre;
+  if (genres && genres.length > 0 && !genres.includes("All")) {
+    queryWithGenreOrMood.genres = { $in: genres };
   } else {
     const targetGenres = MOOD_MAP[mood] || [];
     queryWithGenreOrMood.mood_tags = { $in: targetGenres };
@@ -92,7 +104,7 @@ export async function getServerRecommendation(
 
   let finalQuery = queryWithGenreOrMood;
   let finalCount = await Media.countDocuments(finalQuery);
-  
+
   if (finalCount === 0) {
     // Relax genre/mood constraint
     finalQuery = activeQuery;
@@ -129,5 +141,145 @@ export async function getServerRecommendation(
     });
 
     return toPlainObject(candidates[0]);
+  }
+}
+
+export async function getWatchProviders(mediaId: string, type: 'movie' | 'show'): Promise<any | null> {
+  const TMDB_API_KEY = process.env.TMDB_API_KEY;
+  if (!TMDB_API_KEY) {
+    console.warn("TMDB_API_KEY is not defined in .env.local. Direct streaming options cannot be fetched.");
+    return null;
+  }
+
+  // Extract raw numeric ID, e.g. movie_879945 -> 879945
+  const numericId = mediaId.replace(/^(movie|show)_/, '');
+  const tmdbType = type === 'movie' ? 'movie' : 'tv';
+  const url = `https://api.themoviedb.org/3/${tmdbType}/${numericId}/watch/providers?api_key=${TMDB_API_KEY}`;
+
+  try {
+    const res = await fetch(url, { next: { revalidate: 86400 } }); // Cache for 24 hours
+    if (!res.ok) {
+      console.error(`Failed to fetch TMDB watch providers for ${mediaId}: ${res.statusText}`);
+      return null;
+    }
+    const data = await res.json();
+    return data.results || null;
+  } catch (error) {
+    console.error(`Error fetching watch providers for ${mediaId}:`, error);
+    return null;
+  }
+}
+
+export async function getBlogs(searchQuery?: string): Promise<BlogPostItem[]> {
+  await dbConnect();
+  let query: any = {};
+  if (searchQuery && searchQuery.trim().length > 0) {
+    const regex = new RegExp(searchQuery.trim(), "i");
+    query = {
+      $or: [
+        { title: regex },
+        { summary: regex },
+        { category: regex },
+        { content: regex }
+      ]
+    };
+  }
+  const posts = await BlogPost.find(query).sort({ createdAt: -1 }).lean();
+  return posts.map((doc: any) => ({
+    id: doc.id,
+    title: doc.title,
+    summary: doc.summary,
+    content: doc.content,
+    category: doc.category,
+    views: doc.views || 0,
+    date: doc.date
+  }));
+}
+
+export async function getPopularBlogs(): Promise<BlogPostItem[]> {
+  await dbConnect();
+  const posts = await BlogPost.find({}).sort({ views: -1 }).limit(3).lean();
+  return posts.map((doc: any) => ({
+    id: doc.id,
+    title: doc.title,
+    summary: doc.summary,
+    content: doc.content,
+    category: doc.category,
+    views: doc.views || 0,
+    date: doc.date
+  }));
+}
+
+export async function getBlogPost(id: string): Promise<BlogPostItem | null> {
+  await dbConnect();
+  // Increment views by 1
+  const doc = await BlogPost.findOneAndUpdate({ id }, { $inc: { views: 1 } }, { returnDocument: 'after' }).lean();
+  if (!doc) return null;
+  return {
+    id: doc.id,
+    title: doc.title,
+    summary: doc.summary,
+    content: doc.content,
+    category: doc.category,
+    views: doc.views || 0,
+    date: doc.date
+  };
+}
+
+export async function getReadNextBlogs(currentId: string): Promise<BlogPostItem[]> {
+  await dbConnect();
+  // Get 3 other blogs excluding the current one
+  const posts = await BlogPost.find({ id: { $ne: currentId } }).limit(3).lean();
+  return posts.map((doc: any) => ({
+    id: doc.id,
+    title: doc.title,
+    summary: doc.summary,
+    content: doc.content,
+    category: doc.category,
+    views: doc.views || 0,
+    date: doc.date
+  }));
+}
+
+export async function createBlogPost(
+  post: Omit<BlogPostItem, "views">,
+  passcode: string
+): Promise<{ success: boolean; error?: string }> {
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+  if (!ADMIN_PASSWORD) {
+    return { success: false, error: "Server authentication is not configured" };
+  }
+  if (passcode !== ADMIN_PASSWORD) {
+    return { success: false, error: "Incorrect passcode" };
+  }
+
+  await dbConnect();
+  
+  // Basic validation
+  if (!post.id || !post.title || !post.summary || !post.content || !post.category || !post.date) {
+    return { success: false, error: "Missing required fields" };
+  }
+
+  try {
+    // Check duplicate slug
+    const existing = await BlogPost.findOne({ id: post.id });
+    if (existing) {
+      return { success: false, error: "An article with this slug already exists" };
+    }
+
+    await BlogPost.create({
+      id: post.id,
+      title: post.title,
+      summary: post.summary,
+      content: post.content,
+      category: post.category,
+      date: post.date,
+      views: 0
+    });
+
+    return { success: true };
+  } catch (err: any) {
+    console.error("Error creating blog post:", err);
+    return { success: false, error: err.message || "Failed to create blog post" };
   }
 }

@@ -10,13 +10,15 @@ interface WizardFormProps {
   time: Time;
   type: ContentType;
   sort: SortOption;
-  genre: string | null;
+  genres: string[];
+  language: string;
   availableGenres: string[];
   onChangeMood: (m: Mood) => void;
   onChangeTime: (t: Time) => void;
   onChangeType: (t: ContentType) => void;
   onChangeSort: (s: SortOption) => void;
-  onChangeGenre: (g: string | null) => void;
+  onChangeGenres: (g: string[]) => void;
+  onChangeLanguage: (l: string) => void;
 }
 
 const MOODS: Mood[] = ["Bored", "Eating", "Relaxing", "Hyped"];
@@ -33,6 +35,20 @@ const SORTS: { label: string; value: SortOption }[] = [
   { label: "Most Watched", value: "most watched" },
   { label: "Most Viewed", value: "most viewed" },
   { label: "Newest", value: "newest" },
+];
+
+const LANGUAGES = [
+  { code: "all", label: "Any" },
+  { code: "en", label: "English" },
+  { code: "ja", label: "Japanese" },
+  { code: "ko", label: "Korean" },
+  { code: "zh", label: "Chinese" },
+  { code: "es", label: "Spanish" },
+  { code: "hi", label: "Hindi" },
+  { code: "fr", label: "French" },
+  { code: "de", label: "German" },
+  { code: "it", label: "Italian" },
+  { code: "tr", label: "Turkish" }
 ];
 
 const containerVariants = {
@@ -53,8 +69,8 @@ const itemVariants = {
 };
 
 export default function WizardForm({ 
-  mood, time, type, sort, genre, availableGenres,
-  onChangeMood, onChangeTime, onChangeType, onChangeSort, onChangeGenre 
+  mood, time, type, sort, genres, language, availableGenres,
+  onChangeMood, onChangeTime, onChangeType, onChangeSort, onChangeGenres, onChangeLanguage
 }: WizardFormProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -196,26 +212,57 @@ export default function WizardForm({
                 </label>
                 <div className="flex flex-wrap gap-2 max-h-[150px] overflow-y-auto scrollbar-none pr-2">
                   <button
-                    onClick={() => onChangeGenre(null)}
+                    onClick={() => onChangeGenres([])}
                     className={`px-[12px] py-[6px] rounded-full text-[12px] font-medium transition-colors duration-300 flex-shrink-0 cursor-pointer ${
-                      genre === null
-                        ? "bg-white text-black"
+                      genres.length === 0
+                        ? "bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.2)]"
                         : "bg-transparent text-white/50 border border-white/10 hover:border-white/30 hover:bg-white/5"
                     }`}
                   >
                     Any
                   </button>
-                  {availableGenres.map((g, index) => (
+                  {availableGenres.map((g, index) => {
+                    const isSelected = genres.includes(g);
+                    return (
+                      <button
+                        key={`${g}-${index}`}
+                        onClick={() => {
+                          if (isSelected) {
+                            onChangeGenres(genres.filter((x) => x !== g));
+                          } else {
+                            onChangeGenres([...genres, g]);
+                          }
+                        }}
+                        className={`px-[12px] py-[6px] rounded-full text-[12px] font-medium transition-colors duration-300 flex-shrink-0 cursor-pointer ${
+                          isSelected
+                            ? "bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                            : "bg-transparent text-white/50 border border-white/10 hover:border-white/30 hover:bg-white/5"
+                        }`}
+                      >
+                        {g}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Language */}
+              <div className="space-y-3">
+                <label className="block text-[13px] uppercase tracking-[0.2em] font-bold text-white/40">
+                  Language
+                </label>
+                <div className="flex flex-wrap gap-2 max-h-[150px] overflow-y-auto scrollbar-none pr-2">
+                  {LANGUAGES.map((l) => (
                     <button
-                      key={`${g}-${index}`}
-                      onClick={() => onChangeGenre(g)}
+                      key={l.code}
+                      onClick={() => onChangeLanguage(l.code)}
                       className={`px-[12px] py-[6px] rounded-full text-[12px] font-medium transition-colors duration-300 flex-shrink-0 cursor-pointer ${
-                        genre === g
-                          ? "bg-white text-black"
+                        language === l.code
+                          ? "bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.2)]"
                           : "bg-transparent text-white/50 border border-white/10 hover:border-white/30 hover:bg-white/5"
                       }`}
                     >
-                      {g}
+                      {l.label}
                     </button>
                   ))}
                 </div>
@@ -227,4 +274,5 @@ export default function WizardForm({
     </motion.div>
   );
 }
+
 

@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Play, RotateCw, Bookmark } from "lucide-react";
+import { RotateCw, Bookmark, Play } from "lucide-react";
 import { MediaItem } from "@/types";
+import WatchProviders from "./WatchProviders";
 
 interface RecommendationCardProps {
   item: MediaItem;
@@ -98,7 +99,19 @@ export default function RecommendationCard({ item, onReroll, isSaved, onToggleSa
         </motion.p>
 
         <motion.div
-          className="flex flex-wrap justify-center gap-3"
+          className="w-full max-w-[320px] mx-auto mb-5"
+          variants={itemVariants}
+        >
+          <WatchProviders
+            mediaId={item.id}
+            type={item.type}
+            title={item.title}
+            fallbackLink={item.link}
+          />
+        </motion.div>
+
+        <motion.div
+          className="flex flex-wrap justify-center items-center gap-3"
           variants={itemVariants}
         >
           <motion.a
@@ -107,7 +120,7 @@ export default function RecommendationCard({ item, onReroll, isSaved, onToggleSa
             rel="noopener noreferrer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 bg-white text-black px-[18px] py-[8px] rounded-full text-[13px] font-bold tracking-tight transition-colors hover:bg-gray-200 shadow-[0_0_30px_rgba(255,255,255,0.3)]"
+            className="flex items-center gap-2 bg-white text-black px-[18px] py-[8px] rounded-full text-[13px] font-bold tracking-tight transition-colors hover:bg-gray-200 shadow-[0_0_30px_rgba(255,255,255,0.3)] cursor-pointer"
           >
             <Play size={14} fill="currentColor" /> Watch Now
           </motion.a>
@@ -125,3 +138,5 @@ export default function RecommendationCard({ item, onReroll, isSaved, onToggleSa
     </motion.div>
   );
 }
+
+

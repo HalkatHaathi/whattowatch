@@ -14,7 +14,8 @@ const MediaSchema = new mongoose.Schema({
   vote_count: { type: Number, index: true },
   release_date: { type: String },
   thumbnail: { type: String, required: true },
-  link: { type: String, required: true }
+  link: { type: String, required: true },
+  lang: { type: String, index: true }
 }, { 
   collection: 'media',
   timestamps: true

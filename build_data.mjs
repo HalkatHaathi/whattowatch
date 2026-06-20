@@ -105,6 +105,7 @@ async function processJsonl(filename, type) {
       const release_date = item.release_date || item.first_air_date || "";
       const thumbnail = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : '';
       const link = type === 'movie' ? `https://www.themoviedb.org/movie/${item.id}/watch` : `https://www.themoviedb.org/tv/${item.id}/watch`;
+      const language = item.original_language || 'en';
 
       // Only add items that have a poster and a rating
       if (thumbnail && rating > 0 && title) {
@@ -121,7 +122,8 @@ async function processJsonl(filename, type) {
           vote_count,
           release_date,
           thumbnail,
-          link
+          link,
+          lang: language
         });
       }
     } catch (e) {

@@ -43,12 +43,13 @@ export default function MainClient({ mode }: { mode: "wizard" | "roulette" | "sa
   const [time, setTime] = useState<Time>("30-60 min");
   const [type, setType] = useState<ContentType>("any");
   const [sort, setSort] = useState<SortOption>("recommended");
-  const [genre, setGenre] = useState<string | null>(null);
+  const [genres, setGenres] = useState<string[]>([]);
+  const [language, setLanguage] = useState<string>("all");
   const [recommendation, setRecommendation] = useState<MediaItem | null>(null);
   const [isRecommending, setIsRecommending] = useState(false);
 
   const [allGenres, setAllGenres] = useState<string[]>([]);
-  
+
   useEffect(() => {
     getAllGenres().then(setAllGenres).catch(console.error);
   }, []);
@@ -113,7 +114,7 @@ export default function MainClient({ mode }: { mode: "wizard" | "roulette" | "sa
   useEffect(() => {
     if (mode === "wizard") {
       setIsRecommending(true);
-      getServerRecommendation(mood, time, type, history, sort, genre).then(result => {
+      getServerRecommendation(mood, time, type, history, sort, genres, language).then(result => {
         if (result) {
           setRecommendation(result);
           addToHistory(result.id);
@@ -123,11 +124,11 @@ export default function MainClient({ mode }: { mode: "wizard" | "roulette" | "sa
       }).catch(console.error).finally(() => setIsRecommending(false));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mood, time, type, sort, genre, mode]);
+  }, [mood, time, type, sort, genres, language, mode]);
 
   const handleReroll = () => {
     setIsRecommending(true);
-    getServerRecommendation(mood, time, type, history, sort, genre).then(result => {
+    getServerRecommendation(mood, time, type, history, sort, genres, language).then(result => {
       if (result) {
         setRecommendation(result);
         addToHistory(result.id);
@@ -332,13 +333,15 @@ export default function MainClient({ mode }: { mode: "wizard" | "roulette" | "sa
                       time={time}
                       type={type}
                       sort={sort}
-                      genre={genre}
+                      genres={genres}
+                      language={language}
                       availableGenres={allGenres}
                       onChangeMood={setMood}
                       onChangeTime={setTime}
                       onChangeType={setType}
                       onChangeSort={setSort}
-                      onChangeGenre={setGenre}
+                      onChangeGenres={setGenres}
+                      onChangeLanguage={setLanguage}
                     />
                   </div>
                 ) : (
@@ -410,10 +413,10 @@ export default function MainClient({ mode }: { mode: "wizard" | "roulette" | "sa
                       transition={{ duration: 0.3 }}
                       className="flex flex-col items-center justify-start pt-12 w-full h-[400px]"
                     >
-                      <div 
+                      <div
                         className="w-full pb-8 flex justify-center items-center text-white text-[16px] md:text-[20px] font-black uppercase font-sans leading-none"
-                        style={{ 
-                          textShadow: "0 0 4px #fff, 0 0 10px #fff, 0 0 20px #0ff, 0 0 40px #0ff, 0 0 80px #0ff" 
+                        style={{
+                          textShadow: "0 0 4px #fff, 0 0 10px #fff, 0 0 20px #0ff, 0 0 40px #0ff, 0 0 80px #0ff"
                         }}
                       >
                         {"COMING SOON".split("").map((char, index) => (
@@ -685,6 +688,7 @@ export default function MainClient({ mode }: { mode: "wizard" | "roulette" | "sa
 
         {/* Footer */}
         <footer className="w-full max-w-[1200px] mx-auto flex flex-wrap items-center justify-center gap-6 py-8 px-6 text-[12px] font-medium text-white/40 uppercase tracking-widest border-t border-white/5 mt-12 md:mt-24">
+          <Link href="/blogs" className="hover:text-white transition-colors">Blogs</Link>
           <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
           <Link href="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link>
           <Link href="/about" className="hover:text-white transition-colors">About Us</Link>
