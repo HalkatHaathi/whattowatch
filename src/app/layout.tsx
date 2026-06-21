@@ -50,6 +50,12 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3977113276717477"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+        <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-W6ZENNW7VW"
           strategy="afterInteractive"
         />
